@@ -13,6 +13,10 @@ app.get('/', (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
+app.get('/health', (req, res) => {
+    res.json({ status: 'OK' });
+});
+
 // Örnek JSON verisi döndüren endpoint
 app.get('/data', (req, res) => {
     const data = {
