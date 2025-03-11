@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: devopscase
+  namespace: devopscase  
 spec:
   replicas: 1
   selector:
@@ -18,24 +18,24 @@ spec:
         image: ylmzzeyneep/newbackend
         ports:
         - containerPort: 5000
-      resourcess:
-        requests:
-          memory: "64Mi"
-          cpu: "250m"
-        limits:
-          memory: "128Mi"
-          cpu: "500m"  
+        resources:  
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: devopsusecase
+  namespace: devopscase  
 spec:
   selector:
     app: backend
   ports:
   - protocol: TCP
-    port: 30922
+    port: 5000  
     targetPort: 5000
   type: LoadBalancer
