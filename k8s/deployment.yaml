@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ylmzzeyneep/newbackend:v1
+        image: ylmzzeyneep/backendapp:v1
         ports:
         - containerPort: 5000
         resources:  

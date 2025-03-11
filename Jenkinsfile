@@ -4,7 +4,7 @@ pipeline {
     environment {
         SNYK_CREDENTIALS = 'snyk-token'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
-        BACKEND_HEALTH_URL = 'http://34.133.27.32:5001/data'
+        BACKEND_HEALTH_URL = 'http://localhost:5001/health'
         ARGOCD_SERVER = '34.133.27.32:31125'  
     }
 
@@ -33,7 +33,7 @@ pipeline {
             stage('Build Backend Image') {
                 steps {
                     script {
-                            dockerImage = docker.build("ylmzzeyneep/newbackend:${env.BUILD_NUMBER}")
+                            dockerImage = docker.build("ylmzzeyneep/backendapp:${env.BUILD_NUMBER}")
                             echo "✅ Backend imajı başarıyla build edildi."
                     }
                         
@@ -45,7 +45,7 @@ pipeline {
           stage('Trivy Image Scan') {
             steps {
                 script {
-                    sh "trivy image ylmzzeyneep/newbackend:${env.BUILD_NUMBER} || true"
+                    sh "trivy image ylmzzeyneep/newbackendapp:${env.BUILD_NUMBER} || true"
                     echo "✅ Backend image için Trivy güvenlik taraması tamamlandı."
                 }
             }
