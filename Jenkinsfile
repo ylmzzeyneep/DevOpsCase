@@ -4,7 +4,7 @@ pipeline {
     environment {
         SNYK_CREDENTIALS = 'snyk-token'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
-        BACKEND_HEALTH_URL = 'http://34.133.27.32:31400/data'
+        BACKEND_HEALTH_URL = 'http://34.133.27.32:5001/data'
         ARGOCD_SERVER = '34.133.27.32:31125'  
     }
 
@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('Snyk Security Scan (Frontend Only)') {
+        stage('Snyk Security Scan') {
             steps {
                 script {
                     withCredentials([string(credentialsId: SNYK_CREDENTIALS, variable: 'SNYK_TOKEN')]) {

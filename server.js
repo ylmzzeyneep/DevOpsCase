@@ -4,20 +4,17 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS yapılandırması
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Ana endpoint
 app.get('/', (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK' });
+    res.json({ message: 'Application is healthy!'});
 });
 
-// Örnek JSON verisi döndüren endpoint
 app.get('/data', (req, res) => {
     const data = {
         name: 'Zeynep',
@@ -27,7 +24,6 @@ app.get('/data', (req, res) => {
     res.json(data);
 });
 
-// Sunucuyu başlat
 app.listen(PORT, () => {
     console.log(`✅ Backend running at: http://localhost:${PORT}`);
 });
