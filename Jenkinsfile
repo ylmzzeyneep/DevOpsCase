@@ -4,25 +4,25 @@ pipeline {
     environment {
         SNYK_CREDENTIALS = 'snyk-token'
         DOCKERHUB_CREDENTIALS = 'docker-hub-credentials'
-        BACKEND_HEALTH_URL = 'http://localhost:5001/health'
+        BACKEND_HEALTH_URL = 'http://34.133.27.32:31400/data'
         ARGOCD_SERVER = '34.133.27.32:31125'  
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/ylmzzeyneep/DevOpsCase.git'
+                git branch: 'main', url: 'https://github.com/ylmzzeyneep/DevOpsUseCase.git'
             }
         }
 
-        stage('Snyk Security Scan') {
+        stage('Snyk Security Scan (Frontend Only)') {
             steps {
                 script {
                     withCredentials([string(credentialsId: SNYK_CREDENTIALS, variable: 'SNYK_TOKEN')]) {
-                        dir('backend') {
+                        dir('frontend') {
                             sh 'snyk auth $SNYK_TOKEN'
                             sh 'snyk test || true'
-                            echo "✅ Backend için Snyk güvenlik taraması tamamlandı."
+                            echo "✅ Frontend için Snyk güvenlik taraması tamamlandı."
                         }
                     }
                 }
@@ -30,23 +30,35 @@ pipeline {
         }
 
         stage('Build Images') {
-            stage('Build Backend Image') {
-                steps {
-                    script {
-                            dockerImage = docker.build("ylmzzeyneep/backendapp:${env.BUILD_NUMBER}")
-                            echo "✅ Backend imajı başarıyla build edildi."
+            parallel {
+                stage('Build Backend Image') {
+                    steps {
+                        script {
+                            dir('backend') {
+                                dockerImage = docker.build("ylmzzeyneep/backend:${env.BUILD_NUMBER}")
+                                echo "✅ Backend imajı başarıyla build edildi."
+                            }
+                        }
                     }
-                        
+                }
+                stage('Build Frontend Image') {
+                    steps {
+                        script {
+                            dir('frontend') {
+                                dockerImage = docker.build("ylmzzeyneep/frontend:${env.BUILD_NUMBER}")
+                                echo "✅ Frontend imajı başarıyla build edildi."
+                            }
+                        }
+                    }
                 }
             }
-            
         }
 
-          stage('Trivy Image Scan') {
+          stage('Trivy Image Scan (Frontend Only)') {
             steps {
                 script {
-                    sh "trivy image ylmzzeyneep/newbackendapp:${env.BUILD_NUMBER} || true"
-                    echo "✅ Backend image için Trivy güvenlik taraması tamamlandı."
+                    sh "trivy image ylmzzeyneep/frontend:${env.BUILD_NUMBER} || true"
+                    echo "✅ Frontend imajı için Trivy taraması tamamlandı."
                 }
             }
         }
@@ -63,12 +75,24 @@ pipeline {
         }
 
         stage('Push Images') {
-            stage('Push Backend Image') {
-                steps {
-                    script {
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                            dockerImage.push()
-                            echo "✅ Backend imajı başarıyla Docker Hub'a yüklendi."
+            parallel {
+                stage('Push Backend Image') {
+                    steps {
+                        script {
+                            docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                                dockerImage.push()
+                                echo "✅ Backend imajı başarıyla Docker Hub'a yüklendi."
+                            }
+                        }
+                    }
+                }
+                stage('Push Frontend Image') {
+                    steps {
+                        script {
+                            docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                                dockerImage.push()
+                                echo "✅ Frontend imajı başarıyla Docker Hub'a yüklendi."
+                            }
                         }
                     }
                 }
